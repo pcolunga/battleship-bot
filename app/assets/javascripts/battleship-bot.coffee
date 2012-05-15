@@ -9,14 +9,14 @@ class Point
 
 
 class BattleshipBot
-  constructor: (size) ->
+  constructor: (size = 10) ->
     @size = size
     @commands = ["miss", "carrier", "battleship", "submarine", "destroyer", "patrol", "hit"]
     @ships = @commands[1..5]
     @left = @commands[1..5]
     @init()
 
-  suggest: (out) ->
+  suggest: () ->
     data = (0 for i in [0..99])
     exclude = []
     result = undefined
@@ -36,6 +36,9 @@ class BattleshipBot
           for current, tile in data
             if not (tile in exclude)
               data[tile] = Math.round(data[tile] + @corr(slot, "miss", tile, ship))
+#      else if info is "water"
+#        for ship in @left
+#          data[slot] = Math.round(data[slot] + @ship(slot, ship))
       else if info isnt "water" # other ships given a sunk in a particular slot
         exclude.push(slot)
         for current, tile in data
@@ -45,36 +48,28 @@ class BattleshipBot
                 data[tile] = Math.round(data[tile] + @corr(slot, info, tile, any))
 
     result = (slot for item, slot in data when item is (max = Math.max data...))
-
-    console.log ((@fromScalar(res) for res in exclude))
+    console.log "Excludes : " + ((@fromScalar(res) for res in exclude))
     @printData(@information, "ships")
     @printData(data, "probabilities")
     console.log "Max probability : " + max + " on slots -> " + (@fromScalar(res) for res in result)
-    out("\n" + max)
-    @fromScalar(result[Math.floor(Math.random()*result.length)])
-
-  emptyArray: (value, size) ->
-    result = []
-    for i in [1..size]
-      result.push(value)
-    result
+    result = @fromScalar(result[Math.floor(Math.random()*result.length)])
 
   printData: (data, msg) ->
-    console.log "Displaying " + msg + " data "
+    console.log "Displaying " + msg + " data :"
     console.log (data[i*10..(i+1)*10-1]) for i in [0..9]
 
-  suggestEmpty: (out) ->
+  suggestEmpty: () ->
+    data = (0 for i in [0..99])
     result = undefined
     max = 0
     for info, slot in @information
       if info == "water"
         for ship in @left
-          probability = @ship(slot, ship)
-          if probability > max
-            max = probability
-            result = slot
-    out(max)
-    @fromScalar(if result == undefined then Math.round(Math.random() * 100) else result)
+          data[slot] = Math.round(data[slot] + @ship(slot, ship))
+    @printData(data, "probabilities")
+    result = (slot for item, slot in data when item is (max = Math.max data...))
+    console.log "Max probability : " + max + " on slots -> " + (@fromScalar(res) for res in result)
+    result = @fromScalar(result[Math.floor(Math.random()*result.length)])
 
   # update board with "miss", "hit", "carrier", "battleship", "submarine", "destroyer", or "patrol"
   update: (x, y, command) ->
@@ -84,7 +79,8 @@ class BattleshipBot
   info: (slot, command) ->
     @information[slot] == command
 
-  # corr(slot, ship, tile, command)
+  # corr(slot, ship, tile, command) should tell us the the extra probability of there being a 'ship' at location 'slot',
+  # given the fact that we have the situation 'command' going on at location 'tile' (copyrigth <The Virtuosi>)
   corr: (slot, ship, tile, command) ->
     @correlation[@commands.indexOf(ship)][slot][@commands.indexOf(command) - 1][tile]
 
@@ -100,18 +96,8 @@ class BattleshipBot
 
   init: () ->
     @background = B
-#    @information = @emptyArray("water", 100)
     @information = ("water" for i in [0..99])
     @correlation = C
 
-
-$ ->
-  area = $('#area')
-  a = (text) ->
-    area.append(text)
-  board = new BattleshipBot 10
-  for i in [1..5]
-    suggest = board.suggest(a)
-    a(" -> " + suggest + "\n")
-    board.update(suggest.x,  suggest.y, "carrier")
+@BattleshipBot = BattleshipBot
 

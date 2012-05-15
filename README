@@ -5,8 +5,10 @@ BattleshipBot will suggest you where to shoot while playing Battleship War. Writ
 
 Usage:
 
-- update(x, y, command) to provide information to Bot (eg: 3, 7, ["miss", "hit", "carrier", "battleship", "submarine", "destroyer" or "patrol"])
+var bot = new BattleshipBot
 
-- suggest() will return a Point[x, y] with the highest probability of hit
+bot.suggest() // will return a Point[x, y] with the highest probability of hit
+
+bot.update(x, y, command) // to provide information to Bot (eg: 3, 7, ["miss", "hit", "carrier", "battleship", "submarine", "destroyer" or "patrol"])
 
 Calculations and probailities based on "The Linear Theory of Battleship" by The Virtuosi.
