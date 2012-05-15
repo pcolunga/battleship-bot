@@ -1,4 +1,12 @@
-This is your new Play 2.0 application
+BattleshipBot
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+BattleshipBot will suggest you where to shoot while playing Battleship War. Written in CoffeeScript.
+
+Usage:
+
+- update(x, y, command) to provide information to Bot (eg: 3, 7, ["miss", "hit", "carrier", "battleship", "submarine", "destroyer" or "patrol"])
+
+- suggest() will return a Point[x, y] with the highest probability of hit
+
+Calculations and probailities based on "The Linear Theory of Battleship" by The Virtuosi.
