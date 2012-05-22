@@ -36,9 +36,10 @@ class BattleshipBot
           for current, tile in data
             if not (tile in exclude)
               data[tile] = Math.round(data[tile] + @corr(slot, "miss", tile, ship))
-#      else if info is "water"
-#        for ship in @left
-#          data[slot] = Math.round(data[slot] + @ship(slot, ship))
+            else data[tile] = -500
+      else if info is "water"
+        for ship in @left
+          data[slot] = Math.round(data[slot] + @ship(slot, ship))
       else if info isnt "water" # other ships given a sunk in a particular slot
         exclude.push(slot)
         for current, tile in data
@@ -46,6 +47,7 @@ class BattleshipBot
             for any in @left
               if info isnt any
                 data[tile] = Math.round(data[tile] + @corr(slot, info, tile, any))
+          else data[tile] = -500
 
     result = (slot for item, slot in data when item is (max = Math.max data...))
     console.log "Excludes : " + ((@fromScalar(res) for res in exclude))
