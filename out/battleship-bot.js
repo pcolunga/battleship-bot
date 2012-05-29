@@ -50,10 +50,12 @@
             for (tile = 0, _len3 = data.length; tile < _len3; tile++) {
               current = data[tile];
               if (!(__indexOf.call(exclude, tile) >= 0)) {
-                _ref3 = this.left;
-                for (_j = 0, _len4 = _ref3.length; _j < _len4; _j++) {
-                  any = _ref3[_j];
-                  data[tile] = Math.round(data[tile] + this.corr(slot, ship, tile, any));
+                if (this.xproj(slot, tile) && this.yproj(slot, tile)) {
+                  _ref3 = this.left;
+                  for (_j = 0, _len4 = _ref3.length; _j < _len4; _j++) {
+                    any = _ref3[_j];
+                    data[tile] = Math.round(data[tile] + this.corr(slot, ship, tile, any));
+                  }
                 }
               } else {
                 data[tile] = -500;
@@ -130,6 +132,24 @@
         return _results;
       }).call(this)));
       return result = this.fromScalar(result[Math.floor(Math.random() * result.length)]);
+    };
+    BattleshipBot.prototype.xproj = function(slot, tile) {
+      return true;
+    };
+    BattleshipBot.prototype.yproj = function(slot, tile) {
+      var i, lower, upper, _ref;
+      if (slot % this.size === tile % this.size) {
+        lower = Math.min(slot, tile);
+        upper = Math.max(slot, tile);
+        if (upper - lower > this.size) {
+          for (i = 0, _ref = (upper - lower) / this.size; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+            if (this.information[lower + this.size * i] === "miss") {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
     };
     BattleshipBot.prototype.printData = function(data, msg) {
       var i, _results;

@@ -27,8 +27,9 @@ class BattleshipBot
         for ship in @left
           for current, tile in data
             if not (tile in exclude)
-              for any in @left
-                data[tile] = Math.round(data[tile] + @corr(slot, ship, tile, any))
+              if(@xproj(slot, tile) && @yproj(slot, tile))
+                for any in @left
+                  data[tile] = Math.round(data[tile] + @corr(slot, ship, tile, any))
             else data[tile] = -500
       else if info is "miss"
         exclude.push(slot)
@@ -55,6 +56,24 @@ class BattleshipBot
     @printData(data, "probabilities")
     console.log "Max probability : " + max + " on slots -> " + (@fromScalar(res) for res in result)
     result = @fromScalar(result[Math.floor(Math.random()*result.length)])
+
+  # true if not in xproj or its a valid xproj
+  xproj: (slot, tile) ->
+    if Math.floor(slot / @size) == Math.floor(tile / @size)
+      lower = Math.min(slot, tile)
+      upper = Math.max(slot, tile)
+      if upper - lower > 1
+        return false for i in [lower+1..upper-1] when @information[i] == "miss"
+    true
+
+  # true if not in yproj or its a valid yproj
+  yproj: (slot, tile) ->
+    if slot % @size == tile % @size
+      lower = Math.min(slot, tile)
+      upper = Math.max(slot, tile)
+      if upper - lower > @size
+        return false for i in [0..(upper-lower)/ @size] when @information[lower+@size*i] == "miss"
+    true
 
   printData: (data, msg) ->
     console.log "Displaying " + msg + " data :"
